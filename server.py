@@ -4,7 +4,7 @@
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-from common.connection_states import CLOSE_CONNECTION
+from common.models.message import Message
 
 server = FastAPI()
 
@@ -14,14 +14,14 @@ async def send_message(web_socket: WebSocket):
     await web_socket.accept()
     try:
         while True:
-            message = await web_socket.receive_text()
-            message = message.upper().strip()
+            data = await web_socket.receive_text()
+            message = Message.receive_message(data)
 
-            if message == CLOSE_CONNECTION:
+            if message.is_close_connection():
                 await web_socket.send_text('Connection closed')
                 break
 
-            await web_socket.send_text(message)
+            await web_socket.send_text(message.upper())
 
     except WebSocketDisconnect:
         await web_socket.close()
