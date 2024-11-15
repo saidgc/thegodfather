@@ -3,14 +3,15 @@
 
 from fastapi import FastAPI
 
+from common.connection_states import CLOSE_CONNECTION
 from common.models.message import Message
 
 server = FastAPI()
 
 
-@server.post('/message')
+@server.post('/')
 async def send_message(message: Message):
     content = message.content.strip()
-    if content.upper() == "DESCONEXION":
-        return {"response": "Connection closed"}
-    return {"response": content.upper()}
+    if content.upper() == CLOSE_CONNECTION:
+        return {'response': 'Connection closed'}
+    return {'response': content.upper()}
